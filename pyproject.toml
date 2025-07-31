@@ -1,0 +1,24 @@
+[project]
+name = "daily-minesweeper-solver"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.28.1",
+]
+
+
+[dependency-groups]
+dev = [
+    "isort>=6.0.1",
+    "pytest>=8.4.1",
+    "ruff>=0.12.7",
+]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+extend-select=["N", "PTH"]
+ignore =["D"]
