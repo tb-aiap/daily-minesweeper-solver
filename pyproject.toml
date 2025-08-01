@@ -4,23 +4,42 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "beautifulsoup4>=4.13.4",
-    "httpx>=0.28.1",
-    "selenium>=4.34.2",
-]
+dependencies = ["beautifulsoup4>=4.13.4", "httpx>=0.28.1", "selenium>=4.34.2"]
 
 
 [dependency-groups]
-dev = [
-    "isort>=6.0.1",
-    "pytest>=8.4.1",
-    "ruff>=0.12.7",
-]
+dev = ["isort>=6.0.1", "pytest>=8.4.1", "ruff>=0.12.7"]
 
 [tool.ruff]
 line-length = 88
 
+[tool.ruff.format]
+# Use `\n` line endings for all files
+line-ending = "lf"
+
 [tool.ruff.lint]
-extend-select=["D", "N", "PTH"]
-ignore =["D203", "D213"]
+extend-select = [
+    "ANN", # flake8-annotation for typehints
+    "D",   # pydocstyle 
+    "N",   # pep8-naming 
+    "PTH", # use-pathlib over os
+]
+ignore = [
+    "D203",
+    "D213",
+    "D413",
+    # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+    # to uncomment if error occurs
+    # "W191",
+    # "E111",
+    # "E114",
+    # "E117",
+    # "D206",
+    # "D300",
+    # "Q000",
+    # "Q001",
+    # "Q002",
+    # "Q003",
+    # "COM812",
+    # "COM819",
+]
