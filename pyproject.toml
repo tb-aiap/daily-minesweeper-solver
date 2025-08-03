@@ -24,10 +24,10 @@ extend-select = [
     "N",   # pep8-naming 
     "PTH", # use-pathlib over os
 ]
+
 ignore = [
     "D203",
     "D213",
-    "D413",
     # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
     # to uncomment if error occurs
     # "W191",
@@ -43,3 +43,9 @@ ignore = [
     # "COM812",
     # "COM819",
 ]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.extend-per-file-ignores]
+"test_*.py" = ["ANN"]
