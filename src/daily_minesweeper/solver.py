@@ -1,5 +1,7 @@
 """Modules related to solving the puzzle."""
 
+from __future__ import annotations
+
 from .data_model import Cell, CellState
 
 # from selenium import webdriver
@@ -65,15 +67,6 @@ class Board:
         if value == -1:
             return CellState.empty
         return CellState.is_number
-
-    @staticmethod
-    def _initial_cell_value(value: str) -> int:
-        """Set initial cell value of the board."""
-        if value == "":
-            return -1
-
-        if value.isdigit() and "0" <= "8":
-            return int(str)
 
 
 if __name__ == "__main__":
