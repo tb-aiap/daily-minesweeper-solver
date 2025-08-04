@@ -52,3 +52,26 @@ def test_get_adjacent_cells(sample_easy_board):
     result = board.get_adjacent_cells(*(1, 1))
     assert len(result) == 9
     assert (2, 2) in result
+
+
+def test_getitem_board(sample_easy_board):
+    """Test getitem dunder method."""
+    board = solver.Board(initial_map=sample_easy_board)
+
+    assert board[0][0].value == 2
+    assert board[0][0].state == data_model.CellState.is_number
+
+    assert board[0][1].value == -1
+    assert board[0][1].state == data_model.CellState.empty
+
+
+def test_setitem_board(sample_easy_board):
+    """Test setitem is able to set."""
+    board = solver.Board(initial_map=sample_easy_board)
+
+    assert board[0][0].value == 2
+    assert board[0][0].state == data_model.CellState.is_number
+
+    board[0][0].state = data_model.CellState.suspect
+
+    assert board[0][0].state == data_model.CellState.suspect
