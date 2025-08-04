@@ -5,8 +5,9 @@ Run once to get sample html set for testing.
 
 import logging
 from pathlib import Path
-from daily_minesweeper import utils
+
 from daily_minesweeper import constants as c
+from daily_minesweeper import utils
 
 logger = logging.getLogger(__name__)
 

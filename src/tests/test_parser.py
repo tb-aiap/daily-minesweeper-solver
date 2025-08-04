@@ -1,8 +1,10 @@
 """Unit test for parser module."""
 
-from daily_minesweeper import parser
 from pathlib import Path
+
 import pytest
+
+from daily_minesweeper import parser
 
 EASY_5_MAP = "./src/tests/data/minesweeper-5x5-easy.html"
 HARD_5_MAP = "./src/tests/data/minesweeper-5x5-hard.html"

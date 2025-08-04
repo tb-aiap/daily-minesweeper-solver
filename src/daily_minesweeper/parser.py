@@ -1,6 +1,7 @@
 """Module to get and parse minesweeper data."""
 
 import re
+
 from bs4 import BeautifulSoup
 
 

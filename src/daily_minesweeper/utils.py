@@ -1,8 +1,9 @@
 """Utilities module."""
 
-from selenium import webdriver
-from . import constants as c
 from bs4 import BeautifulSoup
+from selenium import webdriver
+
+from . import constants as c
 
 
 def get_sample_minesweeper_game(url_address: str = None) -> str:
