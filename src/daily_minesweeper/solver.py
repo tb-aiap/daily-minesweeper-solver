@@ -39,27 +39,34 @@ class Board:
 
     def initialize_board(self, array: list[list[str]]) -> list[list[int]]:
         """Create the board with Cell class for difference value and state."""
-        board = array
+        board = []
         for i in range(len(array)):
+            board_row = []
             for j in range(len(array[0])):
                 value = self.validate_value(array[i][j])
-                board[i][j] = Cell(
-                    state=self._initial_cell_state(value),
-                    value=int(value),
-                    x=j,
-                    y=i,
+                board_row.append(
+                    Cell(
+                        state=self._initial_cell_state(value),
+                        value=int(value),
+                        x=j,
+                        y=i,
+                    )
                 )
+            board.append(board_row)
         return board
 
     @staticmethod
     def validate_value(value: str) -> int:
         """Check and validate value received."""
-        if value not in "0123456789" or len(value) > 1:
-            raise Exception(
-                f"excepts empty str or number, receive {value=} and {len(value)=}"
-            )
+        if value == "":
+            return -1
 
-        return -1 if len(value) == 0 else int(value)
+        if value.isdigit() and len(value) == 1:
+            return int(value)
+
+        raise Exception(
+            f"excepts empty str or number, receive {value=} and {len(value)=}"
+        )
 
     @staticmethod
     def _initial_cell_state(value: int) -> CellState:
