@@ -18,6 +18,10 @@ class Board:
         self.columns = len(initial_map[0])
         self.board = self.initialize_board(initial_map)
 
+    def __getitem__(self, idx: int) -> list[Cell]:
+        """Return the row index of the board."""
+        return self.board[idx]
+
     def get_adjacent_cells(self, row: int, col: int) -> list[tuple[int, int]]:
         """Get the adjacent cell including itself based on `self.board` size.
 
@@ -77,4 +81,11 @@ class Board:
 
 
 if __name__ == "__main__":
-    ...
+    sample_board = [
+        ["1", "", "1", "", ""],
+        ["", "", "", "1", ""],
+        ["1", "", "0", "", ""],
+        ["1", "", "1", "2", ""],
+        ["1", "", "", "", ""],
+    ]
+    print(sample_board)
