@@ -34,7 +34,7 @@ def test_initialize_board(sample_easy_board):
     assert board.board[0][0].state == data_model.CellState.is_number
 
     assert board.board[0][1].value == -1
-    assert board.board[0][1].state == data_model.CellState.empty
+    assert board.board[0][1].state == data_model.CellState.unmarked
 
 
 def test_get_adjacent_cells(sample_easy_board):
@@ -62,7 +62,7 @@ def test_getitem_board(sample_easy_board):
     assert board[0][0].state == data_model.CellState.is_number
 
     assert board[0][1].value == -1
-    assert board[0][1].state == data_model.CellState.empty
+    assert board[0][1].state == data_model.CellState.unmarked
 
 
 def test_setitem_board(sample_easy_board):
