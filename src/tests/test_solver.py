@@ -133,3 +133,23 @@ def test_flag_all_numbers():
         assert board[r][c].y == r
         assert board[r][c].x == c
         assert board[r][c].state == data_model.CellState.flag
+
+def test_flag_all_numbers_no_change():
+    """Test that function returns false, and board remains the same."""
+    sample_board = [
+        ["3", "", "", "", "1"],
+        ["", "", "3", "2", ""],
+        ["2", "", "0", "", ""],
+        ["2", "", "2", "3", ""],
+        ["", "", "", "", ""],
+    ]
+    board = solver.Board(sample_board)
+
+    result = solver.flag_all_numbers(1, 2, board)
+    assert not result
+
+    expected_flag = [(0, 1), (0, 2), (0, 3), (1,1), (2,1), (2,3)]
+    for r, c in expected_flag:
+        assert board[r][c].y == r
+        assert board[r][c].x == c
+        assert board[r][c].state == data_model.CellState.unmarked
