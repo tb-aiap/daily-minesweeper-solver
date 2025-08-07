@@ -76,7 +76,9 @@ def test_setitem_board(sample_easy_board):
 
     assert board[0][0].state == data_model.CellState.suspect
 
+
 def test_flag_all_numbers():
+    """Test that function returns true, and update board correctly."""
     sample_board = [
         ["3", "", "", "", "1"],
         ["", "", "3", "2", ""],
@@ -86,23 +88,23 @@ def test_flag_all_numbers():
     ]
     board = solver.Board(sample_board)
 
-    expected_flag_before = [(0,1), (1,0), (1,1)]
-    for r,c in expected_flag_before:
-        assert board[r][c].y == r 
-        assert board[r][c].x == c 
+    expected_flag_before = [(0, 1), (1, 0), (1, 1)]
+    for r, c in expected_flag_before:
+        assert board[r][c].y == r
+        assert board[r][c].x == c
         assert board[r][c].state == data_model.CellState.unmarked
 
-
     # first check in board (0,0)
-    solver.flag_all_numbers(0, 0, board)
+    result = solver.flag_all_numbers(0, 0, board)
+    assert result
 
-    expected_flag = [(0,1), (1,0), (1,1)]
-    for r,c in expected_flag:
-        assert board[r][c].y == r 
-        assert board[r][c].x == c 
+    expected_flag = [(0, 1), (1, 0), (1, 1)]
+    for r, c in expected_flag:
+        assert board[r][c].y == r
+        assert board[r][c].x == c
         assert board[r][c].state == data_model.CellState.flag
 
-    ### SECOND BOARD WITH func ran twice 
+    ### SECOND BOARD WITH func ran twice
     second_sample_board = [
         ["3", "", "", "", "1"],
         ["", "", "3", "2", ""],
@@ -113,19 +115,21 @@ def test_flag_all_numbers():
     board = solver.Board(second_sample_board)
 
     # first check in board (2, 2)
-    solver.flag_all_numbers(2, 2, board)
+    result = solver.flag_all_numbers(2, 2, board)
+    assert result
 
-    expected_flag = [(1,1), (2,1), (3,1),(2,3)]
-    for r,c in expected_flag:
-        assert board[r][c].y == r 
-        assert board[r][c].x == c 
+    expected_flag = [(1, 1), (2, 1), (3, 1), (2, 3)]
+    for r, c in expected_flag:
+        assert board[r][c].y == r
+        assert board[r][c].x == c
         assert board[r][c].state == data_model.CellState.flag
 
     # second check in board (3, 0)
-    solver.flag_all_numbers(3, 0, board)
+    result = solver.flag_all_numbers(3, 0, board)
+    assert result
 
-    expected_flag = [(4,0), (4,1)]
-    for r,c in expected_flag:
-        assert board[r][c].y == r 
-        assert board[r][c].x == c 
+    expected_flag = [(4, 0), (4, 1)]
+    for r, c in expected_flag:
+        assert board[r][c].y == r
+        assert board[r][c].x == c
         assert board[r][c].state == data_model.CellState.flag
