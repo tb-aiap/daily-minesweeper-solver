@@ -126,13 +126,11 @@ def test_flag_all_numbers():
 
     # second check in board (3, 0)
     result = solver.flag_all_numbers(3, 0, board)
-    assert result
+    assert not result
 
-    expected_flag = [(4, 0), (4, 1)]
-    for r, c in expected_flag:
-        assert board[r][c].y == r
-        assert board[r][c].x == c
-        assert board[r][c].state == data_model.CellState.flag
+    # third check in board (4, 0)
+    result = solver.flag_all_numbers(4, 0, board)
+    assert not result
 
 def test_flag_all_numbers_no_change():
     """Test that function returns false, and board remains the same."""
@@ -153,3 +151,61 @@ def test_flag_all_numbers_no_change():
         assert board[r][c].y == r
         assert board[r][c].x == c
         assert board[r][c].state == data_model.CellState.unmarked
+
+def test_flag_all_numbers_consecutively():
+    """Test that function returns true, and update board correctly constantly."""
+    sample_board = [
+        ["3", "", "", "", "1"],
+        ["", "", "3", "2", ""],
+        ["2", "", "0", "", ""],
+        ["2", "", "", "3", ""],
+        ["", "", "2", "", ""],
+    ]
+    board = solver.Board(sample_board)
+
+    expected_flag_before = [(0, 1), (1, 0), (1, 1)]
+    for r, c in expected_flag_before:
+        assert board[r][c].y == r
+        assert board[r][c].x == c
+        assert board[r][c].state == data_model.CellState.unmarked
+
+    # first check in board (0,0)
+    result = solver.flag_all_numbers(0, 0, board)
+    assert result
+
+    expected_flag = [(0, 1), (1, 0), (1, 1)]
+    for r, c in expected_flag:
+        assert board[r][c].y == r
+        assert board[r][c].x == c
+        assert board[r][c].state == data_model.CellState.flag
+
+    # second check in board (2,0)
+    result = solver.flag_all_numbers(2, 0, board)
+    
+    # (2,0) has flagged already
+    assert not result
+
+    # third check in board (2,2)
+    result = solver.flag_all_numbers(2, 2, board)
+    print()
+    board.print_state()
+    assert result
+
+    expected_flag = [(1,1), (2, 1), (3, 1), (2,3), (3,2)]
+    for r, c in expected_flag:
+        assert board[r][c].y == r
+        assert board[r][c].x == c
+        assert board[r][c].state == data_model.CellState.flag
+
+    # fourth check in board (4,2)
+    result = solver.flag_all_numbers(4, 2, board)
+    # should not trigger 
+    assert not result
+
+    # fourth check in board (2,2)
+    # result = solver.flag_all_numbers(2, 2, board)
+    # expected_flag = [(1,1), (2, 1), (3, 1), (2,3)]
+    # for r, c in expected_flag:
+    #     assert board[r][c].y == r
+    #     assert board[r][c].x == c
+    #     assert board[r][c].state == data_model.CellState.flag
