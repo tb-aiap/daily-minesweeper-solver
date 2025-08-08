@@ -1,8 +1,7 @@
 """Modules related to solving the puzzle."""
 
-from __future__ import annotations
+# from __future__ import annotations
 from typing import Callable
-
 from .data_model import Cell, CellState
 
 # from selenium import webdriver
@@ -41,6 +40,11 @@ class Board:
                 result.append((i, j))
 
         return result
+    
+    def get_adjacent_cell_state(self, row:int, col:int, state: CellState):
+        neighbors = self.get_adjacent_cells(row, col)
+        neighbors_w_state = [(r, c) for r, c in neighbors if self[r][c].state == state]
+        return neighbors_w_state
 
     def initialize_board(self, array: list[list[str]]) -> list[list[int]]:
         """Create the board with Cell class for difference value and state."""
@@ -81,73 +85,88 @@ class Board:
         return CellState.is_number
 
     def print_state(self) -> None:
-
+        """Print cell state."""
         for i in range(self.rows):
             board_row = []
             for j in range(self.columns):
                 board_row.append(self.board[i][j].state.value)
-        
+
             print(board_row)
 
     def __repr__(self) -> None:
-        board = "" 
+        """Print the board value by default."""
+        board = ""
         for i in range(self.rows):
             board_row = []
             for j in range(self.columns):
-                val = str(self.board[i][j].value) if self.board[i][j].value >= 0 else " " 
+                val = (
+                    str(self.board[i][j].value) if self.board[i][j].value >= 0 else " "
+                )
                 board_row.append(val)
-        
-            board += str(board_row) + "\n"
-        
-        return board
 
-def flag_all_numbers(row:int, col:int, board: Board) -> bool:
-    """Flag all numbers if neighbors empty space is same as number."""
+            board += str(board_row) + "\n"
+
+        return board
+    
+
+def flag_all_numbers(row: int, col: int, board: Board) -> bool:
+    """Flag all numbers as long as neighbors empty space is same as number.
+
+    If the number is flagged but there are empty spaces similar to number, it will still run. 
+    """
     curr: Cell = board[row][col]
     updated = False
 
     if curr.state != CellState.is_number:
         return False
 
-    number = curr.value 
-    neighbors = board.get_adjacent_cells(row, col)
-    unmarked = [(r,c) for r,c in neighbors if board[r][c].state == CellState.unmarked]
-
+    number = curr.value
+    # flagged = [(r, c) for r, c in neighbors if board[r][c].state == CellState.flag]
+    unmarked = board.get_adjacent_cell_state(row, col, CellState.unmarked)
+    flagged = board.get_adjacent_cell_state(row, col, CellState.flag)
     if len(unmarked) == 0:
+        # if there are no unmarked space, ignore it.
+        return updated
+    
+    if len(flagged) and len(flagged) == number:
+        # if a number (2) has 2 flagged, ignore remaining empty space.
         return updated
     
     if number == 0 or number == len(unmarked):
         for r, c in unmarked:
             board[r][c].state = CellState.flag
-            updated = True 
+            updated = True
 
     return updated
 
-def update_used_numbers(row: int, col:int, board: Board) -> bool:
+
+def update_used_numbers(row: int, col: int, board: Board) -> bool:
     """For a number, if the surrounding is flagged, update all unused cell as empty."""
 
     curr: Cell = board[row][col]
     updated = False
 
-    if curr.state != CellState.is_number or curr.value == 0 :
+    if curr.state != CellState.is_number or curr.value == 0:
         return False
 
     neighbors = board.get_adjacent_cells(row, col)
-    used = [(r,c) for r,c in neighbors if board[r][c].state == CellState.flag]
-    unmarked = [(r,c) for r,c in neighbors if board[r][c].state == CellState.unmarked]
+    used = [(r, c) for r, c in neighbors if board[r][c].state == CellState.flag]
+    unmarked = [(r, c) for r, c in neighbors if board[r][c].state == CellState.unmarked]
 
     if curr.value < len(used):
-        raise Exception(f"flagged more than the value {curr.value}, flagged {len(used)}, on {row, col}") 
+        raise Exception(
+            f"flagged more than the value {curr.value}, flagged {len(used)}, on {row, col}"
+        )
 
     if curr.value == len(used) and len(empty) > 0:
         for r, c in empty:
             board[r][c].state = CellState.flag
             updated = True
-    
+
     return updated
 
-def solve_logically(board: Board, logic_to_use: Callable[[int, int, Board], None] ):
 
+def solve_logically(board: Board, logic_to_use: Callable[[int, int, Board], None]):
     updated = True
     while updated:
         print("loop started")
