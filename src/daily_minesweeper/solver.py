@@ -135,7 +135,12 @@ def flag_all_numbers(row: int, col: int, board: Board) -> bool:
         # if a number (2) has 2 flagged, ignore remaining empty space.
         return updated
 
-    if number == 0 or number == len(unmarked):
+    if number == 0:
+        for r, c in unmarked:
+            board[r][c].state = CellState.empty
+            updated = True
+    
+    if number != 0 and number == len(unmarked):
         for r, c in unmarked:
             board[r][c].state = CellState.flag
             updated = True
@@ -169,19 +174,21 @@ def flag_remaining_unmarked(row: int, col: int, board: Board) -> bool:
 
 
 def solve_logically(board: Board, logic_to_use: Callable[[int, int, Board], None]):
-    updated = True
-    while updated:
-        print("loop started")
-        arr_update = []
-        for i in range(board.rows):
-            for j in range(board.columns):
-                if board[i][j].state != CellState.is_number:
-                    continue
-                logic_used = logic_to_use(i, j, board)
-                if not logic_used:
-                    flag_remaining_unmarked(i, j, board)
-                arr_update.append(logic_used)
-        updated = any(arr_update)
+
+    number_cells = [
+        (r,c)
+        for r in range(board.rows)
+        for c in range(board.columns)
+        if board[r][c].state == CellState.is_number
+    ]
+    
+    def step():
+        return any(logic_to_use(r, c, board) for r,c in number_cells)
+
+    while step(): 
+        print("finish step")
+        board.print_state()
+        pass
 
 
 if __name__ == "__main__":
