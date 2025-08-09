@@ -7,11 +7,11 @@ from enum import StrEnum
 class CellState(StrEnum):
     """Container for different states in a cell."""
 
-    unmarked = "unmarked"
-    suspect = "suspect"
-    flag = "flagged"
-    empty = "empty"
-    is_number = "is_number"
+    unmarked = "?"
+    suspect = "S"
+    flag = "F"
+    empty = "O"
+    is_number = "n"
 
 
 @dataclass
@@ -20,5 +20,6 @@ class Cell:
 
     state: CellState
     value: int
+
     x: int
     y: int

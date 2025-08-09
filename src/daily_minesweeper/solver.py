@@ -1,12 +1,8 @@
 """Modules related to solving the puzzle."""
 
-from __future__ import annotations
+from typing import Callable
 
 from .data_model import Cell, CellState
-
-# from selenium import webdriver
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.common.action_chains import ActionChains
 
 
 class Board:
@@ -40,6 +36,14 @@ class Board:
                 result.append((i, j))
 
         return result
+
+    def get_adjacent_cell_state(
+        self, row: int, col: int, state: CellState
+    ) -> list[tuple[int, int]]:
+        """Filters get_adjacent_cells with certain cell state."""
+        neighbors = self.get_adjacent_cells(row, col)
+        neighbors_w_state = [(r, c) for r, c in neighbors if self[r][c].state == state]
+        return neighbors_w_state
 
     def initialize_board(self, array: list[list[str]]) -> list[list[int]]:
         """Create the board with Cell class for difference value and state."""
@@ -76,8 +80,116 @@ class Board:
     def _initial_cell_state(value: int) -> CellState:
         """Set initial cell state of the board."""
         if value == -1:
-            return CellState.empty
+            return CellState.unmarked
         return CellState.is_number
+
+    def print_state(self) -> None:
+        """Print cell state."""
+        for i in range(self.rows):
+            board_row = []
+            for j in range(self.columns):
+                board_row.append(self.board[i][j].state.value)
+
+            print(board_row)
+
+    def __repr__(self) -> None:
+        """Print the board value by default."""
+        board = ""
+        for i in range(self.rows):
+            board_row = []
+            for j in range(self.columns):
+                val = (
+                    str(self.board[i][j].value) if self.board[i][j].value >= 0 else " "
+                )
+                board_row.append(val)
+
+            board += str(board_row) + "\n"
+
+        return board
+
+
+def flag_all_numbers(row: int, col: int, board: Board) -> bool:
+    """Flag all numbers as long as neighbors empty space is same as number.
+
+    If the number is flagged but there are empty spaces similar to number, it will still run.
+    """
+    curr: Cell = board[row][col]
+    updated = False
+
+    if curr.state != CellState.is_number:
+        return False
+
+    number = curr.value
+    # flagged = [(r, c) for r, c in neighbors if board[r][c].state == CellState.flag]
+    unmarked = board.get_adjacent_cell_state(row, col, CellState.unmarked)
+    flagged = board.get_adjacent_cell_state(row, col, CellState.flag)
+    if len(unmarked) == 0:
+        # if there are no unmarked space, ignore it.
+        return updated
+
+    if len(flagged) and len(flagged) == number:
+        # if a number (2) has 2 flagged, ignore remaining empty space.
+        return updated
+
+    if number == 0:
+        for r, c in unmarked:
+            board[r][c].state = CellState.empty
+            updated = True
+
+    if number != 0 and number == len(unmarked) + len(flagged):
+        for r, c in unmarked:
+            board[r][c].state = CellState.flag
+            updated = True
+
+    return updated
+
+
+def flag_remaining_unmarked(row: int, col: int, board: Board) -> bool:
+    """For a number, if the surrounding is flagged, update all unused cell as empty."""
+    curr: Cell = board[row][col]
+    updated = False
+
+    if curr.value == 0:
+        return False
+
+    # neighbors = board.get_adjacent_cells(row, col)
+    flagged = board.get_adjacent_cell_state(row, col, CellState.flag)
+    unmarked = board.get_adjacent_cell_state(row, col, CellState.unmarked)
+
+    if curr.value < len(flagged):
+        raise Exception(
+            f"flagged more than the value {curr.value}, flagged {len(flagged)}, on {row, col}"
+        )
+
+    if curr.value == len(flagged) and len(unmarked) > 0:
+        for r, c in unmarked:
+            board[r][c].state = CellState.empty
+            updated = True
+
+    return updated
+
+
+def solve_logically(
+    board: Board, strategies: list[Callable[[int, int, Board], bool]]
+) -> None:
+    """Loop through each solving strategy on the board and try to clear as much as possible."""
+    number_cells = [
+        (r, c)
+        for r in range(board.rows)
+        for c in range(board.columns)
+        if board[r][c].state == CellState.is_number
+    ]
+
+    def step() -> bool:
+        """Continuously loop all strategies to apply. Stops when none of the strategy works further."""
+        return any(
+            strategy(r, c, board) for strategy in strategies for r, c in number_cells
+        )
+
+    while step():
+        print("finish step")
+        board.print_state()
+        pass
 
 
 if __name__ == "__main__":
@@ -88,4 +200,11 @@ if __name__ == "__main__":
         ["1", "", "1", "2", ""],
         ["1", "", "", "", ""],
     ]
-    print(sample_board)
+    board = Board(sample_board)
+    print(board)
+    board.print_state()
+
+    solve_logically(board, [flag_all_numbers, flag_remaining_unmarked])
+
+    print(board)
+    board.print_state()
