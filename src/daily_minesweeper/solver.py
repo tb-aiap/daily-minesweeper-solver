@@ -40,8 +40,11 @@ class Board:
                 result.append((i, j))
 
         return result
-    
-    def get_adjacent_cell_state(self, row:int, col:int, state: CellState):
+
+    def get_adjacent_cell_state(
+        self, row: int, col: int, state: CellState
+    ) -> list[tuple[int, int]]:
+        """Filters get_adjacent_cells with certain cell state."""
         neighbors = self.get_adjacent_cells(row, col)
         neighbors_w_state = [(r, c) for r, c in neighbors if self[r][c].state == state]
         return neighbors_w_state
@@ -107,12 +110,12 @@ class Board:
             board += str(board_row) + "\n"
 
         return board
-    
+
 
 def flag_all_numbers(row: int, col: int, board: Board) -> bool:
     """Flag all numbers as long as neighbors empty space is same as number.
 
-    If the number is flagged but there are empty spaces similar to number, it will still run. 
+    If the number is flagged but there are empty spaces similar to number, it will still run.
     """
     curr: Cell = board[row][col]
     updated = False
@@ -127,11 +130,11 @@ def flag_all_numbers(row: int, col: int, board: Board) -> bool:
     if len(unmarked) == 0:
         # if there are no unmarked space, ignore it.
         return updated
-    
+
     if len(flagged) and len(flagged) == number:
         # if a number (2) has 2 flagged, ignore remaining empty space.
         return updated
-    
+
     if number == 0 or number == len(unmarked):
         for r, c in unmarked:
             board[r][c].state = CellState.flag
@@ -140,26 +143,25 @@ def flag_all_numbers(row: int, col: int, board: Board) -> bool:
     return updated
 
 
-def update_used_numbers(row: int, col: int, board: Board) -> bool:
+def flag_remaining_unmarked(row: int, col: int, board: Board) -> bool:
     """For a number, if the surrounding is flagged, update all unused cell as empty."""
-
     curr: Cell = board[row][col]
     updated = False
 
-    if curr.state != CellState.is_number or curr.value == 0:
+    if curr.value == 0:
         return False
 
-    neighbors = board.get_adjacent_cells(row, col)
-    used = [(r, c) for r, c in neighbors if board[r][c].state == CellState.flag]
-    unmarked = [(r, c) for r, c in neighbors if board[r][c].state == CellState.unmarked]
+    # neighbors = board.get_adjacent_cells(row, col)
+    flagged = board.get_adjacent_cell_state(row, col, CellState.flag)
+    unmarked = board.get_adjacent_cell_state(row, col, CellState.unmarked)
 
-    if curr.value < len(used):
+    if curr.value < len(flagged):
         raise Exception(
-            f"flagged more than the value {curr.value}, flagged {len(used)}, on {row, col}"
+            f"flagged more than the value {curr.value}, flagged {len(flagged)}, on {row, col}"
         )
 
-    if curr.value == len(used) and len(empty) > 0:
-        for r, c in empty:
+    if curr.value == len(flagged) and len(unmarked) > 0:
+        for r, c in unmarked:
             board[r][c].state = CellState.flag
             updated = True
 
@@ -176,7 +178,8 @@ def solve_logically(board: Board, logic_to_use: Callable[[int, int, Board], None
                 if board[i][j].state != CellState.is_number:
                     continue
                 logic_used = logic_to_use(i, j, board)
-                update_used_numbers(i, j, board)
+                if not logic_used:
+                    flag_remaining_unmarked(i, j, board)
                 arr_update.append(logic_used)
         updated = any(arr_update)
 
