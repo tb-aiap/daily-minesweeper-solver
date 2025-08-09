@@ -80,56 +80,46 @@ def test_setitem_board(sample_easy_board):
 def test_flag_all_numbers():
     """Test that function returns true, and update board correctly."""
     sample_board = [
-        ["3", "", "", "", "1"],
-        ["", "", "3", "2", ""],
-        ["2", "", "0", "", ""],
-        ["2", "", "2", "3", ""],
-        ["", "", "", "", ""],
+        ["1", "", "1", "", ""],
+        ["", "", "", "1", ""],
+        ["1", "", "0", "", ""],
+        ["1", "", "1", "2", ""],
+        ["1", "", "", "", ""],
     ]
     board = solver.Board(sample_board)
 
-    expected_flag_before = [(0, 1), (1, 0), (1, 1)]
-    for r, c in expected_flag_before:
+    expected_flag = [(1, 2), (1, 1), (2, 1), (3,1), (2,3)]
+    for r, c in expected_flag:
         assert board[r][c].y == r
         assert board[r][c].x == c
         assert board[r][c].state == data_model.CellState.unmarked
 
-    # first check in board (0,0)
-    result = solver.flag_all_numbers(0, 0, board)
-    assert result
-
-    expected_flag = [(0, 1), (1, 0), (1, 1)]
-    for r, c in expected_flag:
-        assert board[r][c].y == r
-        assert board[r][c].x == c
-        assert board[r][c].state == data_model.CellState.flag
-
-    ### SECOND BOARD WITH func ran twice
-    second_sample_board = [
-        ["3", "", "", "", "1"],
-        ["", "", "3", "2", ""],
-        ["2", "", "0", "", ""],
-        ["2", "", "2", "3", ""],
-        ["", "", "", "", ""],
-    ]
-    board = solver.Board(second_sample_board)
-
-    # first check in board (2, 2)
+    # first check in board (2,2)
     result = solver.flag_all_numbers(2, 2, board)
     assert result
 
-    expected_flag = [(1, 1), (2, 1), (3, 1), (2, 3)]
+    for r, c in expected_flag:
+        assert board[r][c].y == r
+        assert board[r][c].x == c
+        assert board[r][c].state == data_model.CellState.empty
+
+
+    # second check in board (2, 0)
+    result = solver.flag_all_numbers(2, 0, board)
+    assert result
+
+    expected_flag = [(1, 0)]
     for r, c in expected_flag:
         assert board[r][c].y == r
         assert board[r][c].x == c
         assert board[r][c].state == data_model.CellState.flag
 
-    # second check in board (3, 0)
-    result = solver.flag_all_numbers(3, 0, board)
+    # second check in board (3, 2)
+    result = solver.flag_all_numbers(3, 2, board)
     assert not result
 
-    # third check in board (4, 0)
-    result = solver.flag_all_numbers(4, 0, board)
+    # third check in board (1, 3)
+    result = solver.flag_all_numbers(1, 3, board)
     assert not result
 
 
@@ -157,51 +147,56 @@ def test_flag_all_numbers_no_change():
 def test_flag_all_numbers_consecutively():
     """Test that function returns true, and update board correctly constantly."""
     sample_board = [
-        ["3", "", "", "", "1"],
-        ["", "", "3", "2", ""],
-        ["2", "", "0", "", ""],
-        ["2", "", "", "3", ""],
-        ["", "", "2", "", ""],
+        ["1", "", "1", "", ""],
+        ["", "", "", "1", ""],
+        ["1", "", "0", "", ""],
+        ["1", "", "1", "2", ""],
+        ["1", "", "", "", ""],
     ]
     board = solver.Board(sample_board)
 
-    expected_flag_before = [(0, 1), (1, 0), (1, 1)]
-    for r, c in expected_flag_before:
-        assert board[r][c].y == r
-        assert board[r][c].x == c
-        assert board[r][c].state == data_model.CellState.unmarked
-
     # first check in board (0,0)
     result = solver.flag_all_numbers(0, 0, board)
-    assert result
-
-    expected_flag = [(0, 1), (1, 0), (1, 1)]
-    for r, c in expected_flag:
-        assert board[r][c].y == r
-        assert board[r][c].x == c
-        assert board[r][c].state == data_model.CellState.flag
-
-    # second check in board (2,0)
-    result = solver.flag_all_numbers(2, 0, board)
-
-    # (2,0) has flagged already
     assert not result
 
-    # third check in board (2,2)
+    # next check in board (2,2)
     result = solver.flag_all_numbers(2, 2, board)
     assert result
 
-    expected_flag = [(1, 1), (2, 1), (3, 1), (2, 3), (3, 2)]
+    expected_flag = [(1, 2), (1, 1), (2, 1), (3,1), (2,3)]
     for r, c in expected_flag:
         assert board[r][c].y == r
         assert board[r][c].x == c
+        assert board[r][c].state == data_model.CellState.empty
+
+    # second check in board (2,0)
+    result = solver.flag_all_numbers(2, 0, board)
+    assert result
+
+    expected_flag = [(1, 0)]
+    for r, c in expected_flag:
         assert board[r][c].state == data_model.CellState.flag
 
-    # fourth check in board (4,2)
-    result = solver.flag_all_numbers(4, 2, board)
-    # should not trigger
+    expected_flag = [(1, 1), (2,1), (3,1)]
+    for r, c in expected_flag:
+        assert board[r][c].state == data_model.CellState.empty
+    
+    # third check in board (0,0)
+    result = solver.flag_all_numbers(0, 0, board)
     assert not result
 
+    expected_flag = [(1, 1)]
+    for r, c in expected_flag:
+        assert board[r][c].state == data_model.CellState.empty
+
+    expected_flag = [(0, 1)]
+    for r, c in expected_flag:
+        assert board[r][c].state == data_model.CellState.unmarked
+
+    expected_flag = [(1, 0)]
+    for r, c in expected_flag:
+        assert board[r][c].state == data_model.CellState.flag
+    
 
 def test_flag_remaining_unmarked():
     """Test that function returns true, and update remaining unmarked cells accordingly."""
