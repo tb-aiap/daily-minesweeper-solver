@@ -1,12 +1,8 @@
 """Modules related to solving the puzzle."""
 
-# from __future__ import annotations
 from typing import Callable
-from .data_model import Cell, CellState
 
-# from selenium import webdriver
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.common.action_chains import ActionChains
+from .data_model import Cell, CellState
 
 
 class Board:
@@ -139,8 +135,8 @@ def flag_all_numbers(row: int, col: int, board: Board) -> bool:
         for r, c in unmarked:
             board[r][c].state = CellState.empty
             updated = True
-    
-    if number != 0 and number == len(unmarked):
+
+    if number != 0 and number == len(unmarked) + len(flagged):
         for r, c in unmarked:
             board[r][c].state = CellState.flag
             updated = True
@@ -167,25 +163,30 @@ def flag_remaining_unmarked(row: int, col: int, board: Board) -> bool:
 
     if curr.value == len(flagged) and len(unmarked) > 0:
         for r, c in unmarked:
-            board[r][c].state = CellState.flag
+            board[r][c].state = CellState.empty
             updated = True
 
     return updated
 
 
-def solve_logically(board: Board, logic_to_use: Callable[[int, int, Board], None]):
-
+def solve_logically(
+    board: Board, strategies: list[Callable[[int, int, Board], bool]]
+) -> None:
+    """Loop through each solving strategy on the board and try to clear as much as possible."""
     number_cells = [
-        (r,c)
+        (r, c)
         for r in range(board.rows)
         for c in range(board.columns)
         if board[r][c].state == CellState.is_number
     ]
-    
-    def step():
-        return any(logic_to_use(r, c, board) for r,c in number_cells)
 
-    while step(): 
+    def step() -> bool:
+        """Continuously loop all strategies to apply. Stops when none of the strategy works further."""
+        return any(
+            strategy(r, c, board) for strategy in strategies for r, c in number_cells
+        )
+
+    while step():
         print("finish step")
         board.print_state()
         pass
@@ -203,7 +204,7 @@ if __name__ == "__main__":
     print(board)
     board.print_state()
 
-    solve_logically(board, flag_all_numbers)
+    solve_logically(board, [flag_all_numbers, flag_remaining_unmarked])
 
     print(board)
     board.print_state()
