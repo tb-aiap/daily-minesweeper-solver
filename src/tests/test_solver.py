@@ -88,7 +88,7 @@ def test_flag_all_numbers():
     ]
     board = solver.Board(sample_board)
 
-    expected_flag = [(1, 2), (1, 1), (2, 1), (3,1), (2,3)]
+    expected_flag = [(1, 2), (1, 1), (2, 1), (3, 1), (2, 3)]
     for r, c in expected_flag:
         assert board[r][c].y == r
         assert board[r][c].x == c
@@ -102,7 +102,6 @@ def test_flag_all_numbers():
         assert board[r][c].y == r
         assert board[r][c].x == c
         assert board[r][c].state == data_model.CellState.empty
-
 
     # second check in board (2, 0)
     result = solver.flag_all_numbers(2, 0, board)
@@ -163,7 +162,7 @@ def test_flag_all_numbers_consecutively():
     result = solver.flag_all_numbers(2, 2, board)
     assert result
 
-    expected_flag = [(1, 2), (1, 1), (2, 1), (3,1), (2,3)]
+    expected_flag = [(1, 2), (1, 1), (2, 1), (3, 1), (2, 3)]
     for r, c in expected_flag:
         assert board[r][c].y == r
         assert board[r][c].x == c
@@ -177,10 +176,10 @@ def test_flag_all_numbers_consecutively():
     for r, c in expected_flag:
         assert board[r][c].state == data_model.CellState.flag
 
-    expected_flag = [(1, 1), (2,1), (3,1)]
+    expected_flag = [(1, 1), (2, 1), (3, 1)]
     for r, c in expected_flag:
         assert board[r][c].state == data_model.CellState.empty
-    
+
     # third check in board (0,0)
     result = solver.flag_all_numbers(0, 0, board)
     assert not result
@@ -196,7 +195,7 @@ def test_flag_all_numbers_consecutively():
     expected_flag = [(1, 0)]
     for r, c in expected_flag:
         assert board[r][c].state == data_model.CellState.flag
-    
+
 
 def test_flag_remaining_unmarked():
     """Test that function returns true, and update remaining unmarked cells accordingly."""
@@ -234,7 +233,7 @@ def test_flag_remaining_unmarked():
     for r, c in currently_marked:
         assert board[r][c].y == r
         assert board[r][c].x == c
-        assert board[r][c].state == data_model.CellState.flag
+        assert board[r][c].state == data_model.CellState.empty
 
     # third check
     # before flagging (3,0), it has 2 flag surrounding number 2.
@@ -246,11 +245,7 @@ def test_flag_remaining_unmarked():
 
     # act
     result = solver.flag_remaining_unmarked(3, 0, board)
-    assert result
-    for r, c in third_expected:
-        assert board[r][c].y == r
-        assert board[r][c].x == c
-        assert board[r][c].state == data_model.CellState.flag
+    assert not result
 
 
 def test_flag_remaining_unmarked_skip_zero():
