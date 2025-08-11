@@ -4,7 +4,6 @@ from typing import Callable
 
 from .data_model import Cell, CellState
 
-
 class Board:
     """Board class to store the minesweeper data and includes methods to search within the board."""
 
@@ -44,6 +43,15 @@ class Board:
         neighbors = self.get_adjacent_cells(row, col)
         neighbors_w_state = [(r, c) for r, c in neighbors if self[r][c].state == state]
         return neighbors_w_state
+
+    def get_all_cells_by_state(self, state: CellState) -> list[Cell]:
+        """Get all cells in board filtered by cell state."""
+        return [
+            (r, c)
+            for r in range(self.rows)
+            for c in range(self.columns)
+            if self[r][c].state == state
+        ]
 
     def initialize_board(self, array: list[list[str]]) -> list[list[int]]:
         """Create the board with Cell class for difference value and state."""
@@ -120,7 +128,6 @@ def flag_all_numbers(row: int, col: int, board: Board) -> bool:
         return False
 
     number = curr.value
-    # flagged = [(r, c) for r, c in neighbors if board[r][c].state == CellState.flag]
     unmarked = board.get_adjacent_cell_state(row, col, CellState.unmarked)
     flagged = board.get_adjacent_cell_state(row, col, CellState.flag)
     if len(unmarked) == 0:
@@ -136,7 +143,7 @@ def flag_all_numbers(row: int, col: int, board: Board) -> bool:
             board[r][c].state = CellState.empty
             updated = True
 
-    if number != 0 and number == len(unmarked) + len(flagged):
+    if number != 0 and number == (len(unmarked) + len(flagged)):
         for r, c in unmarked:
             board[r][c].state = CellState.flag
             updated = True
@@ -152,7 +159,6 @@ def flag_remaining_unmarked(row: int, col: int, board: Board) -> bool:
     if curr.value == 0:
         return False
 
-    # neighbors = board.get_adjacent_cells(row, col)
     flagged = board.get_adjacent_cell_state(row, col, CellState.flag)
     unmarked = board.get_adjacent_cell_state(row, col, CellState.unmarked)
 
@@ -168,30 +174,6 @@ def flag_remaining_unmarked(row: int, col: int, board: Board) -> bool:
 
     return updated
 
-
-def solve_logically(
-    board: Board, strategies: list[Callable[[int, int, Board], bool]]
-) -> None:
-    """Loop through each solving strategy on the board and try to clear as much as possible."""
-    number_cells = [
-        (r, c)
-        for r in range(board.rows)
-        for c in range(board.columns)
-        if board[r][c].state == CellState.is_number
-    ]
-
-    def step() -> bool:
-        """Continuously loop all strategies to apply. Stops when none of the strategy works further."""
-        return any(
-            strategy(r, c, board) for strategy in strategies for r, c in number_cells
-        )
-
-    while step():
-        print("finish step")
-        board.print_state()
-        pass
-
-
 if __name__ == "__main__":
     sample_board = [
         ["1", "", "1", "", ""],
@@ -201,10 +183,10 @@ if __name__ == "__main__":
         ["1", "", "", "", ""],
     ]
     board = Board(sample_board)
-    print(board)
-    board.print_state()
-
-    solve_logically(board, [flag_all_numbers, flag_remaining_unmarked])
+    number_cells = board.get_all_cells_by_state(CellState.is_number)
+    strategies = [flag_all_numbers, flag_remaining_unmarked]
+    while any(strategy(r, c, board) for strategy in strategies for r, c in number_cells):
+        pass
 
     print(board)
     board.print_state()
