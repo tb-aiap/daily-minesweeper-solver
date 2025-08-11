@@ -1,8 +1,7 @@
 """Modules related to solving the puzzle."""
 
-from typing import Callable
-
 from .data_model import Cell, CellState
+
 
 class Board:
     """Board class to store the minesweeper data and includes methods to search within the board."""
@@ -174,6 +173,7 @@ def flag_remaining_unmarked(row: int, col: int, board: Board) -> bool:
 
     return updated
 
+
 if __name__ == "__main__":
     sample_board = [
         ["1", "", "1", "", ""],
@@ -185,7 +185,9 @@ if __name__ == "__main__":
     board = Board(sample_board)
     number_cells = board.get_all_cells_by_state(CellState.is_number)
     strategies = [flag_all_numbers, flag_remaining_unmarked]
-    while any(strategy(r, c, board) for strategy in strategies for r, c in number_cells):
+    while any(
+        strategy(r, c, board) for strategy in strategies for r, c in number_cells
+    ):
         pass
 
     print(board)
