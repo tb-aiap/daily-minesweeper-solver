@@ -1,5 +1,6 @@
 """Modules related to solving the puzzle."""
 
+from collections import defaultdict
 from .data_model import Cell, CellState
 
 
@@ -216,7 +217,7 @@ def deduce_from_neighbors_and_flag(row: int, col: int, board: Board) -> bool:
         to_empty = [c for c in neighbor_unmarked if c not in overlapped_cell]
 
         if len(to_mark) == 0 and len(to_empty) == 0:
-            return updated
+            continue
 
         remaining_value = curr.value - len(flagged)
         remaining_neighbor_value = neighbor_value - len(neighbor_flagged)
@@ -233,6 +234,81 @@ def deduce_from_neighbors_and_flag(row: int, col: int, board: Board) -> bool:
             for nr, nc in to_empty:
                 board[nr][nc].state = CellState.empty
             updated = True
+            break
+    return updated
+
+
+def suspect_adjacent_candidates_and_mark_neighbor_empty(
+    row: int, col: int, board: Board
+) -> bool:
+    """Instead of comparing adjacent neighbors, check if adjacent unmarked is used by neighbors.
+
+    Example:
+    4 - 2 pattern, but 2 is not adjacent neighbor.
+    Deduce that 2 is required for 4, mark No 2 other value as empty.
+
+    2 3 1
+    . 4 .
+    . . .
+    . 2 .
+    . . .
+
+    Mark cell of 2 that must be empty to satisfy #4 condition
+    2 3 1
+    . 4 .
+    . . .
+    e 2 e
+    e e e
+    """
+    updated = False
+    curr: Cell = board[row][col]
+    unmarked = board.get_adjacent_cell_state(row, col, CellState.unmarked)
+    flagged = board.get_adjacent_cell_state(row, col, CellState.flag)
+
+    # for each adjacent unmarked cell, get its other number neighbor.
+    suspect_neighbor_hash = defaultdict(set)
+    for r, c in unmarked:
+        neighbor_num = board.get_adjacent_cell_state(r, c, CellState.is_number)
+        for n in neighbor_num:
+            if n == (row, col):
+                continue
+            suspect_neighbor_hash[n].add((r, c))
+
+    if len(unmarked) == 0:
+        return updated
+
+    for k, v in suspect_neighbor_hash.items():
+        overlapped = set(unmarked).intersection(v)
+        k_value = board[k[0]][k[1]].value
+        k_neighbor_unmarked = board.get_adjacent_cell_state(
+            k[0], k[1], CellState.unmarked
+        )
+        k_neighbor_flagged = board.get_adjacent_cell_state(k[0], k[1], CellState.flag)
+
+        to_mark = [c for c in unmarked if c not in overlapped]
+        to_empty = [c for c in k_neighbor_unmarked if c not in overlapped]
+
+        remaining_value = curr.value - len(flagged)
+        remaining_neighbor_value = k_value - len(k_neighbor_flagged)
+
+        if len(to_mark) == 0 and len(to_empty) == 0:
+            continue
+
+        if len(to_mark) and (remaining_value - remaining_neighbor_value) == len(
+            to_mark
+        ):
+            for mr, mc in to_mark:
+                board[mr][mc].state = CellState.flag
+            for nr, nc in to_empty:
+                board[nr][nc].state = CellState.empty
+            updated = True
+            break
+        elif len(to_mark) == 0 and (remaining_value - remaining_neighbor_value) == 0:
+            for nr, nc in to_empty:
+                board[nr][nc].state = CellState.empty
+            updated = True
+            break
+
     return updated
 
 
