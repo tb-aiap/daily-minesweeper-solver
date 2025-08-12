@@ -49,7 +49,7 @@ def draw_board(board: Board) -> Table:
     width = board.columns
     height = board.rows
 
-    table = Table(show_header=False, box=box.ASCII2, min_width=4, expand=False)
+    table = Table(show_header=False, box=box.ASCII2, expand=False)
 
     for r in range(height):
         gather_row = []
@@ -95,6 +95,7 @@ if __name__ == "__main__":
     logical_strategy = [
         solver.flag_remaining_unmarked,
         solver.flag_all_numbers,
+        solver.deduce_from_neighbors_and_flag,
     ]
     with Live(draw_board(board), console=console, refresh_per_second=4) as live:
         number_cells = [
@@ -106,13 +107,15 @@ if __name__ == "__main__":
 
         def step() -> bool:
             """Continuously loop all strategies to apply. Stops when none of the strategy works further."""
-            return any(
-                strategy(r, c, board)
-                for strategy in logical_strategy
-                for r, c in number_cells
-            )
+            for strategy in logical_strategy:
+                for r, c in number_cells:
+                    update = strategy(r, c, board)
+                    if update:
+                        print(strategy.__name__, r, c)
+                        return True
+            return False
 
         while step():
-            time.sleep(0.5)
+            time.sleep(1)
             live.update(draw_board(board))
             pass
