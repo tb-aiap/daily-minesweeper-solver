@@ -13,13 +13,15 @@ from selenium.webdriver.common.by import By
 from daily_minesweeper import constants, display, parser, solver
 from daily_minesweeper.data_model import CellState
 
-URL = constants.BASE_URL + constants.EASY_20 + "/"
+URL = constants.BASE_URL + constants.DAILY + "/"
 
 console = Console()
 
 logical_strategy = [
     solver.flag_all_numbers,
     solver.flag_remaining_unmarked,
+    solver.deduce_from_neighbors_and_flag,
+    solver.suspect_adjacent_candidates_and_mark_neighbor_empty,
 ]
 
 
