@@ -31,6 +31,8 @@ class Board:
 
         for i in range(min_height, max_height + 1):
             for j in range(min_width, max_width + 1):
+                if i == row and j == col:
+                    continue
                 result.append((i, j))
 
         return result
@@ -95,7 +97,10 @@ class Board:
         for i in range(self.rows):
             board_row = []
             for j in range(self.columns):
-                board_row.append(self.board[i][j].state.value)
+                if self.board[i][j].state == CellState.is_number:
+                    board_row.append(self.board[i][j].value)
+                else:
+                    board_row.append(self.board[i][j].state.value)
 
             print(board_row)
 
@@ -174,21 +179,62 @@ def flag_remaining_unmarked(row: int, col: int, board: Board) -> bool:
     return updated
 
 
-if __name__ == "__main__":
-    sample_board = [
-        ["1", "", "1", "", ""],
-        ["", "", "", "1", ""],
-        ["1", "", "0", "", ""],
-        ["1", "", "1", "2", ""],
-        ["1", "", "", "", ""],
-    ]
-    board = Board(sample_board)
-    number_cells = board.get_all_cells_by_state(CellState.is_number)
-    strategies = [flag_all_numbers, flag_remaining_unmarked]
-    while any(
-        strategy(r, c, board) for strategy in strategies for r, c in number_cells
-    ):
-        pass
+def deduce_from_neighbors_and_flag(row: int, col: int, board: Board) -> bool:
+    """For a number, check for common neighbors pattern and flag remaining cells.
 
-    print(board)
-    board.print_state()
+    Try to determine the subset of both neighbors. If they overlaps or not.
+
+    Example:
+    4 - 1 pattern, safe to flag top 3.
+    Deduce from neighbor 1, only 1 slot. No 1 (?) overlaps with adjacent No 4
+    . . .
+    . 4 .
+    . 1 .
+    . . .
+
+    f f f
+    ? 4 ?
+    ? 1 ?
+    e e e
+    """
+    updated = False
+    curr: Cell = board[row][col]
+    unmarked = board.get_adjacent_cell_state(row, col, CellState.unmarked)
+    flagged = board.get_adjacent_cell_state(row, col, CellState.flag)
+    neighbor_number = board.get_adjacent_cell_state(row, col, CellState.is_number)
+
+    if len(unmarked) == 0:
+        return updated
+
+    for r, c in neighbor_number:
+        neighbor_value = board[r][c].value
+        neighbor_unmarked = board.get_adjacent_cell_state(r, c, CellState.unmarked)
+        neighbor_flagged = board.get_adjacent_cell_state(r, c, CellState.flag)
+
+        overlapped_cell = set(unmarked).intersection(set(neighbor_unmarked))
+        to_mark = [c for c in unmarked if c not in overlapped_cell]
+        to_empty = [c for c in neighbor_unmarked if c not in overlapped_cell]
+
+        if len(to_mark) == 0 and len(to_empty) == 0:
+            return updated
+
+        remaining_value = curr.value - len(flagged)
+        remaining_neighbor_value = neighbor_value - len(neighbor_flagged)
+        if len(to_mark) and (remaining_value - remaining_neighbor_value) == len(
+            to_mark
+        ):
+            for mr, mc in to_mark:
+                board[mr][mc].state = CellState.flag
+            for nr, nc in to_empty:
+                board[nr][nc].state = CellState.empty
+            updated = True
+            break
+        elif len(to_mark) == 0 and (remaining_value - remaining_neighbor_value) == 0:
+            for nr, nc in to_empty:
+                board[nr][nc].state = CellState.empty
+            updated = True
+    return updated
+
+
+if __name__ == "__main__":
+    ...
