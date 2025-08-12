@@ -42,15 +42,15 @@ def test_get_adjacent_cells(sample_easy_board):
     board = solver.Board(initial_map=sample_easy_board)
 
     result = board.get_adjacent_cells(*(0, 0))
-    assert len(result) == 4
+    assert len(result) == 3
     assert (1, 1) in result
 
     result = board.get_adjacent_cells(*(2, 0))
-    assert len(result) == 6
+    assert len(result) == 5
     assert (3, 1) in result
 
     result = board.get_adjacent_cells(*(1, 1))
-    assert len(result) == 9
+    assert len(result) == 8
     assert (2, 2) in result
 
 
