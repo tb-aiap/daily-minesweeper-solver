@@ -12,6 +12,13 @@ from .solver import Board
 
 console = Console()
 
+MINE_ICON = [
+    "⬤",
+    "●",
+    "💣",
+    "🚩",
+]
+
 
 def create_cell_value(cell: Cell) -> str:
     """Update the cell according to its value and state."""
@@ -32,7 +39,7 @@ def create_cell_value(cell: Cell) -> str:
         return f"[{color}]{cell.value}[/{color}]"
 
     if cell.state == CellState.flag:
-        return "[red]🚩[/red]"
+        return f"[red]{MINE_ICON[0]}[/red]"
 
     if cell.state == CellState.suspect:
         return "[yellow]?[/yellow]"
