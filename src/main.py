@@ -1,5 +1,6 @@
 """Main entry for solving minesweeper."""
 
+import sys
 import time
 from typing import Callable
 
@@ -10,14 +11,14 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 
-from daily_minesweeper import constants, display, parser, solver
+from daily_minesweeper import constants, display, parser, solver, utils
 from daily_minesweeper.data_model import CellState
 
-DIFFICULTY = constants.DAILY
+DIFFICULTY = utils.parse_sysargv_difficulty(sys.argv)
 
 WEBPAGE_CLICK_SPEED = 100  # in milliseconds
 CONSOLE_CLICK_SPEED = 10  # in milliseconds
-SCROLL_WAIT_TIME = 100 # in milliseconds
+SCROLL_WAIT_TIME = 100  # in milliseconds
 
 console = Console()
 
@@ -59,6 +60,7 @@ def main() -> None:
     4. Apply the series of functions as strategy to solve the board.
     5. Translate the flagged cell into positions to click for website.
     """
+    console.print(f"[bold blue]💣 Solving for difficulty {DIFFICULTY} 💣[/]")
     ## OPEN THE WEB BROWSER
     driver = webdriver.Firefox()
     driver.get(constants.BASE_URL + DIFFICULTY + "/")
