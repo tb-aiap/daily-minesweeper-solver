@@ -24,8 +24,8 @@ DIFFICULTY = [
     "hard_10",
     "hard_20",
     "daily",
-    "weekly",
-    "monthly",
+    # "weekly",
+    # "monthly",
 ]
 
 ## HTML TAGS AND IDS
