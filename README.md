@@ -13,8 +13,8 @@ I spent 7 - 10 mins daily clearing the `daily-minesweeper` difficulty which is a
 This project is using [uv](https://docs.astral.sh/uv/) for the following
 - package management
 - virtual environment management
-- formatter
-- linter
+- formatter (uv's ruff)
+- linter (uv's ruff)
 
 Please follow the installation guide on [uv](https://docs.astral.sh/uv/). Below command shows the current `uv` version
 ```bash
