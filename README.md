@@ -1,4 +1,4 @@
-# MineSweeper
+# MineSweeper 💣
 
 A robot to Solve minesweeper in a certain website.
 
