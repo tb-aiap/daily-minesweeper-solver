@@ -13,6 +13,20 @@ EASY_20 = "minesweeper-20x20-easy"
 HARD_20 = "minesweeper-20x20-hard"
 
 DAILY = "daily-minesweeper"
+WEEKLY = "weekly-minesweeper"
+MONTHLY = "monthly-minesweeper"
+
+DIFFICULTY = [
+    "easy_5",
+    "easy_10",
+    "easy_20",
+    "hard_5",
+    "hard_10",
+    "hard_20",
+    "daily",
+    "weekly",
+    "monthly",
+]
 
 ## HTML TAGS AND IDS
 GAME_ID = "game"
